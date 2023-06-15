@@ -38,3 +38,15 @@ export async function fnCreateTodo(
 
   return await todosAcess.fnCreateTodoItem(newItem)
 }
+
+/**
+ * name: fnGetTodosForUser
+ * @param: userId
+ * @return {todosAccess} A promise
+ * description: Get all todo with each user id
+ */
+export async function fnGetTodosForUser(userId: string): Promise<TodoItem[]> {
+  logger.info('Get todos for user function called.')
+
+  return todosAcess.fnGetAllTodos(userId)
+}
