@@ -26,13 +26,13 @@ export async function fnCreateTodo(
 
   const todoId = uuid.v4()
   const createdAt = new Date().toISOString()
-  const s3AttachmentUrl = attachmentUtils.fnGetAttachmentUrl(todoId)
+  // const s3AttachmentUrl = attachmentUtils.fnGetAttachmentUrl(todoId)
   const newItem = {
     userId,
     todoId,
     createdAt,
     done: false,
-    attachmentUrl: s3AttachmentUrl,
+    // attachmentUrl: s3AttachmentUrl,
     ...newTodo
   }
 
@@ -89,8 +89,11 @@ export async function fnDeleteTodo(
  * description: Upload image
  */
 export async function fnCreateAttachmentPresignedUrl(
-  todoId: string
+  todoId: string,
+  userId: string
 ): Promise<string> {
   logger.info('Create attachment function called', todoId)
+
+  todosAccess.fnUpdateTodoAttachmentUrl(userId, todoId)
   return attachmentUtils.fnGetUploadUrl(todoId)
 }
