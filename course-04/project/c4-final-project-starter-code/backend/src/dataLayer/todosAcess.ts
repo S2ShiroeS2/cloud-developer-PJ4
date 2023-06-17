@@ -4,10 +4,12 @@ import { DocumentClient } from 'aws-sdk/clients/dynamodb'
 import { createLogger } from '../utils/logger'
 import { TodoItem } from '../models/TodoItem'
 import { TodoUpdate } from '../models/TodoUpdate'
+import { AttachmentUtils } from '../helpers/attachmentUtils'
 
 var AWSXRay = require('aws-xray-sdk')
 const XAWS = AWSXRay.captureAWS(AWS)
 const logger = createLogger('TodosAccess')
+const attachmentUtils = new AttachmentUtils()
 
 // TODO: Implement the dataLayer logic
 export class TodosAccess {
@@ -97,12 +99,12 @@ export class TodosAccess {
   }
 
   async fnUpdateTodoAttachmentUrl(
-    todoId: string,
     userId: string,
-    attachmentUrl: string
+    todoId: string
   ): Promise<void> {
     logger.info('Updating todo attachment url...')
 
+    const s3AttachmentUrl = attachmentUtils.fnGetAttachmentUrl(todoId)
     const params = {
       TableName: this.todosTable,
       Key: {
@@ -111,10 +113,10 @@ export class TodosAccess {
       },
       UpdateExpression: 'set attachmentUrl = :attachmentUrl',
       ExpressionAttributeValues: {
-        ':attachmentUrl': attachmentUrl
-      }
+        ':attachmentUrl': s3AttachmentUrl
+      },
+      ReturnValues: 'UPDATED_NEW'
     }
-
     await this.docClient.update(params).promise()
   }
 }
